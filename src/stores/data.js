@@ -18,6 +18,11 @@ export const useDataStore = defineStore('counter', () => {
   const selectedC=ref(new Set())
   const ids = ref(new Set())
 
+  const basePlaceholder = computed(() => {
+    return `Select base currency. (Default: ${baseCurrency.value})`
+  });
+
+
 
   // set their initial values
 
@@ -54,7 +59,6 @@ function makeplot() {
   var numOfYears = 1
 
   limit.setFullYear(currentDate.getFullYear() - numOfYears);
-  console.log("Base: ", baseCurrency.value)
   var url="https://api.exchangerate.host/timeseries?start_date="+
           limit.toJSON().slice(0, 10)+
           "&end_date=" +currentDate.toJSON().slice(0, 10)+
@@ -110,7 +114,7 @@ function changeBase(currency){
   replot()
 }
 // pinia requires to return the data
-  return { ids, config, layout,  replot, currencies, selectedC, changeData, changeBase, registerId, deregisterId, baseCurrency}
+  return { ids, config, layout,  replot, currencies, selectedC, changeData, changeBase, registerId, deregisterId, baseCurrency, basePlaceholder}
 
 })
 

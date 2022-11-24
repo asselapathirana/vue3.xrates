@@ -21,7 +21,7 @@ const selected=ref([]) // even when you don't use the v-model, it is needed for 
     v-model="selected" 
     :multiple="false"
     :options="storeData.currencies" 
-    placeholder="Select base currency" 
+    :placeholder="storeData.basePlaceholder"
     v-on:update:modelValue="storeData.changeBase" 
 > </multiselect><!-- see https://stackoverflow.com/a/68316374 for v-on:update:modelValue="storeData.changeData"-->
     </div>
