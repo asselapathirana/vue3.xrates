@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import  Plotly  from 'plotly.js-dist/plotly'
 import * as d3 from 'd3'
+import { Collapse } from 'bootstrap'
 
 export const useDataStore = defineStore('counter', () => {
   //ref()s become state properties
@@ -15,6 +16,7 @@ export const useDataStore = defineStore('counter', () => {
   const currencies = ref([])
   const selectedC=ref(new Set())
   const ids = ref(new Set())
+
 
   // set their initial values
 
@@ -39,7 +41,7 @@ function deregisterId(id){
 }
 
 function replot(type){
-  console.log("replot called for ids:", ids.value.size, " and currencies ", selectedC.value.size)
+  //console.log("replot called for ids:", ids.value.size, " and currencies ", selectedC.value.size)
   if (ids.value.size > 0  && selectedC.value.size >0){
     makeplot()
   }
@@ -48,16 +50,24 @@ function replot(type){
 function makeplot() {
   var currentDate = new Date()
   var limit = new Date()
-  var numOfYears = 10
+  var numOfYears = 1
 
   limit.setFullYear(currentDate.getFullYear() - numOfYears);
   var url="https://api.exchangerate.host/timeseries?start_date="+
           limit.toJSON().slice(0, 10)+
           "&end_date=" +currentDate.toJSON().slice(0, 10)+
           "&symbols="+Array.from(selectedC.value).join(',')
-  console.log("url",url )
+  //console.log("url",url )
   ;(async () => {
-    const res = await  d3.json(url);
+    var res
+    if (url in data){
+      console.log("old data")
+      res = data[url]
+    }else{
+      console.log("new!!! ")
+      res = await  d3.json(url);
+      data[url]=res
+    }
     plotData(res)
   })()
 };
@@ -67,7 +77,7 @@ function plotData(data){
   var x=Object.keys(data.rates)
   var _y=Object.values(data.rates)
   for (const curr of selectedC.value) {
-    console.log("Doing: ", curr); 
+    //console.log("Doing: ", curr); 
     traces.push({
       x:x,
       y:_y.map(function (co) {
@@ -82,7 +92,7 @@ function plotData(data){
     Plotly.newPlot(id, traces);
   }
 
-  console.log("tr", traces )
+  //console.log("tr", traces )
 }
 
 function changeData(currency){
@@ -90,7 +100,7 @@ function changeData(currency){
   replot()
 }
 // pinia requires to return the data
-  return { ids, data, config, layout ,  replot, currencies, selectedC, changeData, registerId, deregisterId}
+  return { ids, config, layout,  replot, currencies, selectedC, changeData, registerId, deregisterId}
 
 })
 
