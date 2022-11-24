@@ -10,6 +10,7 @@ export const useDataStore = defineStore('counter', () => {
   //function()s become actions
   // see https://pinia.vuejs.org/core-concepts/#setup-stores
   //following are state properties:
+  const baseCurrency = ref('EUR')
   const data = ref([])
   const config = ref({})
   const layout = ref({})
@@ -101,7 +102,7 @@ function changeData(currency){
   replot()
 }
 // pinia requires to return the data
-  return { ids, config, layout,  replot, currencies, selectedC, changeData, registerId, deregisterId}
+  return { ids, config, layout,  replot, currencies, selectedC, changeData, registerId, deregisterId, baseCurrency}
 
 })
 
