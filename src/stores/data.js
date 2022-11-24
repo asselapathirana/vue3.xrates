@@ -13,7 +13,7 @@ export const useDataStore = defineStore('counter', () => {
   const config = ref({})
   const layout = ref({})
   const currencies = ref([])
-  const selectedC=ref([])
+  const selectedC=ref(new Set())
   const ids = ref(new Set())
 
   // set their initial values
@@ -39,8 +39,8 @@ function deregisterId(id){
 }
 
 function replot(type){
-  //console.log("replot called for ids:", ids.value, " and currencies ", selectedC.value)
-  if (ids.value && type){
+  console.log("replot called for ids:", ids.value.size, " and currencies ", selectedC.value.size)
+  if (ids.value.size > 0  && selectedC.value.size >0){
     makeplot()
   }
 }
@@ -50,14 +50,15 @@ function makeplot() {
   var limit = new Date()
   var numOfYears = 10
   limit.setFullYear(currentDate.getFullYear() - numOfYears);
-  var url=`https://api.exchangerate.host/timeseries?start_date=${limit.toJSON().slice(0, 10)}&end_date=${currentDate.toJSON().slice(0, 10)}`
-  //console.log("limit", limit.toJSON().slice(0, 10), `URL ${url}`)
+  var url="https://api.exchangerate.host/timeseries?start_date="+
+          limit.toJSON().slice(0, 10)+
+          "&end_date=" +currentDate.toJSON().slice(0, 10)+
+          "&symbols="+Array.from(selectedC.value).join(',')
+  console.log("url",url )
   ;(async () => {
-    await d3.json(url, function(err, data){ 
-    console.log("Data & error", data, err)
-    plotData(data) } );
+    const res = await  d3.json(url);
+    plotData(res)
   })()
-  console.log("... ?")
 };
 
 function plotData(data){
@@ -65,7 +66,7 @@ function plotData(data){
 }
 
 function changeData(currency){
-  selectedC.value=currency
+  selectedC.value=new Set(currency)
   replot()
 }
 // pinia requires to return the data
