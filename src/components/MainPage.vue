@@ -8,9 +8,9 @@ import TimeTrigger from './TimeTrigger.vue'
 
 <div class="container-fluid p-5 bg-primary text-white text-center">
   <h1>Exchange rate history</h1>
-  <p>Presse one of the buttons.</p> 
+  <p>Select the Currency</p> 
   <data-changer />
-  <time-trigger />
+ <!-- <time-trigger /> -->
 </div>
   
 <div class="container mt-5">

@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import  Plotly  from 'plotly.js-dist/plotly'
 import * as d3 from 'd3'
 
 export const useDataStore = defineStore('counter', () => {
@@ -12,17 +13,14 @@ export const useDataStore = defineStore('counter', () => {
   const config = ref({})
   const layout = ref({})
   const currencies = ref([])
+  const selectedC=ref([])
+  const ids = ref(new Set())
 
   // set their initial values
-  data.value=setData()
+
   config.value= { displayModeBar: true }
   layout.value= { margin: {l:20, r:20, t:30, b:20} }
   
-
-  //action to change data
-  function changeData(){
-    data.value=setData()
-  }
 
 //https://stackoverflow.com/questions/64117116/how-can-i-use-async-await-in-the-vue-3-0-setup-function-using-typescript
 //Note the semicolon - leave it there. 
@@ -32,37 +30,47 @@ export const useDataStore = defineStore('counter', () => {
   })()
 
 
-function getData(type){
-  var d = data.value
-
-  if (type=="pie"){
-    d=[{values: data.value[0].y,
-      labels: data.value[0].x,
-      type:type, 
-      sort:false}]
-  }
-
-  const c=config.value
-  const l=layout.value
-
-  //Plotly seem to mutate these values. So, to ensure it does not happen, we deepcopy things. 
-  return  {data: JSON.parse(JSON.stringify(d)), 
-    config: JSON.parse(JSON.stringify(c)), 
-    layout: JSON.parse(JSON.stringify(l)) }
+function registerId(id){
+  ids.value.add(id)
 }
 
-  // pinia requires to return the data
-  return { data, config, layout , changeData,  getData, currencies}
+function deregisterId(id){
+  ids.value.delete(id)
+}
+
+function replot(type){
+  //console.log("replot called for ids:", ids.value, " and currencies ", selectedC.value)
+  if (ids.value && type){
+    makeplot()
+  }
+}
+
+function makeplot() {
+  var currentDate = new Date()
+  var limit = new Date()
+  var numOfYears = 10
+  limit.setFullYear(currentDate.getFullYear() - numOfYears);
+  var url=`https://api.exchangerate.host/timeseries?start_date=${limit.toJSON().slice(0, 10)}&end_date=${currentDate.toJSON().slice(0, 10)}`
+  //console.log("limit", limit.toJSON().slice(0, 10), `URL ${url}`)
+  ;(async () => {
+    await d3.json(url, function(err, data){ 
+    console.log("Data & error", data, err)
+    plotData(data) } );
+  })()
+  console.log("... ?")
+};
+
+function plotData(data){
+  console.log("data", data)
+}
+
+function changeData(currency){
+  selectedC.value=currency
+  replot()
+}
+// pinia requires to return the data
+  return { ids, data, config, layout ,  replot, currencies, selectedC, changeData, registerId, deregisterId}
 
 })
 
-
-
-function setData() {
-  return [{
-    x: [1, 2, 3, 4],
-    y: [10 + Math.random(), 15 + Math.random(), 13 + Math.random(), 27 * Math.random()],
-    type: "scatter"
-  }]
-}
 

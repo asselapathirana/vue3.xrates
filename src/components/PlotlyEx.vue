@@ -44,21 +44,13 @@ const height = computed({
         },
 })
 
+//end debounce code
+
 function newPlot(newplot=true){
- const d=get_data()
-  // update plot (react - same signature as newPlot)
-  //Plotly.react(id, d.data, d.layout, d.config)
-  // but there is a buggy behavior in window sizing so, use inefficient redraw!
-  if(newplot){
-    Plotly.newPlot(id, d.data, d.layout, d.config)
-  }
-  else{
-    Plotly.react(id, d.data, d.layout, d.config)
-  }
-  //console.log("newPlotting: ", id)
+  storeData.replot(props.type, id)
 
 }
-//end debounce code
+
 
 // template props are defined. Then they can be accessed as props.type etc.
 const props = defineProps(['type', 'fill', 'hole'])
@@ -68,34 +60,18 @@ const id = uuid4()
 
 onUnmounted(()=>{
   window.removeEventListener("resize", newPlot);
-
+  storeData.deregisterId(id)
 })
 onMounted(() => {
   // resize - newPlot
    window.addEventListener("resize", newPlot);
-
+  // send the id to the pinia store
+  storeData.registerId(id)
   newPlot()
 })
 storeData.$subscribe((mutation, state) => {
   newPlot(false)
 })
 
-function get_data() {
-  // get chart data from pina store and customize
-  const d=storeData.getData(props.type);
-  d.data[0].type=props.type;
-  d.data[0].fill=props.fill;
-  if (props.hole){
-    d.data[0]["hole"]=props.hole
-  }
-  if (props.type=="bubble"){
-    d.data[0]['mode']='markers',
-    d.data[0]['marker']={size: d.data[0].y}
-  
-  }
-  //d.layout["margin_autoexpand"]=false;
-  //d.layout["margin_r"]=240;
-  //console.log("all",d.data, d.config, d.layout)
-  return d;
-}
+
 </script>
