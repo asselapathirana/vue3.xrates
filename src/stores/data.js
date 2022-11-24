@@ -49,6 +49,7 @@ function makeplot() {
   var currentDate = new Date()
   var limit = new Date()
   var numOfYears = 10
+
   limit.setFullYear(currentDate.getFullYear() - numOfYears);
   var url="https://api.exchangerate.host/timeseries?start_date="+
           limit.toJSON().slice(0, 10)+
@@ -62,7 +63,26 @@ function makeplot() {
 };
 
 function plotData(data){
-  console.log("data", data)
+  var traces=[]
+  var x=Object.keys(data.rates)
+  var _y=Object.values(data.rates)
+  for (const curr of selectedC.value) {
+    console.log("Doing: ", curr); 
+    traces.push({
+      x:x,
+      y:_y.map(function (co) {
+        return co[curr]
+    }),
+    }
+
+    )
+
+  }
+  for (const id of ids.value){
+    Plotly.newPlot(id, traces);
+  }
+
+  console.log("tr", traces )
 }
 
 function changeData(currency){
