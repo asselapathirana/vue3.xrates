@@ -21,7 +21,7 @@ const storeData = useDataStore()
 <div class="container mt-5">
   <div class="row ">
     <div class="card">
-    <h3 class="text-center"> {{storeData.baseCurrency}}.x </h3>
+    <h3 class="text-center"> Rate {{storeData.baseCurrency}}.x </h3>
     <div >
         <PlotlyEx type="scatter"  />
     </div>
