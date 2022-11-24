@@ -16,7 +16,7 @@ import TimeTrigger from './TimeTrigger.vue'
 <div class="container mt-5">
   <div class="row ">
     <div class="card">
-    <h3 class="text-center">Line </h3>
+    <h3 class="text-center"> Exchange Rate History </h3>
     <div >
         <PlotlyEx type="scatter"  />
     </div>

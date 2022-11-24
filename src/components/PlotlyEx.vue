@@ -73,5 +73,4 @@ storeData.$subscribe((mutation, state) => {
   newPlot(false)
 })
 
-
 </script>

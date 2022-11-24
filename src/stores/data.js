@@ -61,10 +61,10 @@ function makeplot() {
   ;(async () => {
     var res
     if (url in data){
-      console.log("old data")
+      //console.log("old data")
       res = data[url]
     }else{
-      console.log("new!!! ")
+      //console.log("new!!! ")
       res = await  d3.json(url);
       data[url]=res
     }
@@ -83,6 +83,7 @@ function plotData(data){
       y:_y.map(function (co) {
         return co[curr]
     }),
+    name: curr,
     }
 
     )
