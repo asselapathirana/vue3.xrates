@@ -1,6 +1,7 @@
 <script setup >
 import PlotlyEx from './PlotlyEx.vue'
 import DataChanger from './DataChanger.vue'
+import BaseChanger from './BaseChanger.vue'
 import TimeTrigger from './TimeTrigger.vue'
 
 // import pinia store and instantiate
@@ -14,6 +15,7 @@ const storeData = useDataStore()
 <div class="container-fluid p-5 bg-primary text-white text-center">
   <h1>Exchange rate history</h1>
   <p>Select the Currency</p> 
+  <base-changer />
   <data-changer />
  <!-- <time-trigger /> -->
 </div>

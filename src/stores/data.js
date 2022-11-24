@@ -54,10 +54,12 @@ function makeplot() {
   var numOfYears = 1
 
   limit.setFullYear(currentDate.getFullYear() - numOfYears);
+  console.log("Base: ", baseCurrency.value)
   var url="https://api.exchangerate.host/timeseries?start_date="+
           limit.toJSON().slice(0, 10)+
           "&end_date=" +currentDate.toJSON().slice(0, 10)+
-          "&symbols="+Array.from(selectedC.value).join(',')
+          "&symbols="+Array.from(selectedC.value).join(',')+
+          "&base="+baseCurrency.value
   //console.log("url",url )
   ;(async () => {
     var res
@@ -84,6 +86,7 @@ function plotData(data){
       y:_y.map(function (co) {
         return co[curr]
     }),
+    showlegend: true,
     name: curr,
     }
 
@@ -101,8 +104,13 @@ function changeData(currency){
   selectedC.value=new Set(currency)
   replot()
 }
+
+function changeBase(currency){
+  baseCurrency.value=currency
+  replot()
+}
 // pinia requires to return the data
-  return { ids, config, layout,  replot, currencies, selectedC, changeData, registerId, deregisterId, baseCurrency}
+  return { ids, config, layout,  replot, currencies, selectedC, changeData, changeBase, registerId, deregisterId, baseCurrency}
 
 })
 
