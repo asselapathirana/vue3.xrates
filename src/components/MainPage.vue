@@ -2,8 +2,7 @@
 import PlotlyEx from './PlotlyEx.vue'
 import DataChanger from './DataChanger.vue'
 import BaseChanger from './BaseChanger.vue'
-import TimeTrigger from './TimeTrigger.vue'
-
+import ChartLayout from './ChartLayout.vue'
 // import pinia store and instantiate
 import { useDataStore } from '../stores/data'
 const storeData = useDataStore()
@@ -17,6 +16,7 @@ const storeData = useDataStore()
   <p>Select the Currency</p> 
   <base-changer />
   <data-changer />
+  <chart-layout />
  <!-- <time-trigger /> -->
 </div>
   

@@ -17,11 +17,15 @@ export const useDataStore = defineStore('counter', () => {
   const currencies = ref([])
   const selectedC=ref(new Set())
   const ids = ref(new Set())
+  const logscale=ref(false)
 
   const basePlaceholder = computed(() => {
     return `Select base currency. (Default: ${baseCurrency.value})`
   });
 
+  const selectedCCodes = computed(()=>{
+      return Array.from(selectedC.value).map(x=>x.code)
+  });
 
 
   // set their initial values
@@ -33,8 +37,9 @@ export const useDataStore = defineStore('counter', () => {
 //https://stackoverflow.com/questions/64117116/how-can-i-use-async-await-in-the-vue-3-0-setup-function-using-typescript
 //Note the semicolon - leave it there. 
   ;(async () => {
-    const res = await  d3.json("https://api.exchangerate.host/latest");
-    currencies.value=Object.keys(res.rates)
+    const res = await  d3.json("https://api.exchangerate.host/symbols");
+    const res2= Object.values(res.symbols).map(obj => ({ ...obj, label: '[ ' +obj.code + ' ] ' + obj.description}))
+    currencies.value=Object.values(res2)
   })()
 
 
@@ -46,8 +51,7 @@ function deregisterId(id){
   ids.value.delete(id)
 }
 
-function replot(type){
-  //console.log("replot called for ids:", ids.value.size, " and currencies ", selectedC.value.size)
+function replot(){
   if (ids.value.size > 0  && selectedC.value.size >0){
     makeplot()
   }
@@ -59,10 +63,12 @@ function makeplot() {
   var numOfYears = 1
 
   limit.setFullYear(currentDate.getFullYear() - numOfYears);
+
+
   var url="https://api.exchangerate.host/timeseries?start_date="+
           limit.toJSON().slice(0, 10)+
           "&end_date=" +currentDate.toJSON().slice(0, 10)+
-          "&symbols="+Array.from(selectedC.value).join(',')+
+          "&symbols="+selectedCCodes.value.join(',')+
           "&base="+baseCurrency.value
   //console.log("url",url )
   ;(async () => {
@@ -80,10 +86,11 @@ function makeplot() {
 };
 
 function plotData(data){
+  //console.log("selectedC:", selectedC.value)
   var traces=[]
   var x=Object.keys(data.rates)
   var _y=Object.values(data.rates)
-  for (const curr of selectedC.value) {
+  for (const curr of selectedCCodes.value) {
     //console.log("Doing: ", curr); 
     traces.push({
       x:x,
@@ -97,8 +104,22 @@ function plotData(data){
     )
 
   }
+
+  if (logscale.value){
+    var layout = {
+      yaxis: {
+        type: 'log',
+        autorange: true
+      }
+    };
+  }else{
+    layout ={}
+  }
+
+
+  //console.log("traces: ", traces)
   for (const id of ids.value){
-    Plotly.newPlot(id, traces);
+    Plotly.newPlot(id, traces, layout);
   }
 
   //console.log("tr", traces )
@@ -110,11 +131,12 @@ function changeData(currency){
 }
 
 function changeBase(currency){
-  baseCurrency.value=currency
+  baseCurrency.value=currency.code
   replot()
 }
 // pinia requires to return the data
-  return { ids, config, layout,  replot, currencies, selectedC, changeData, changeBase, registerId, deregisterId, baseCurrency, basePlaceholder}
+  return { ids, config, layout,  replot, currencies, selectedC, 
+    changeData, changeBase, registerId, deregisterId, baseCurrency, basePlaceholder, logscale}
 
 })
 
